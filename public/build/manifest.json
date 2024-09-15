@@ -1,0 +1,34 @@
+{
+  "_axios-BimPEqV4.js": {
+    "file": "assets/axios-BimPEqV4.js",
+    "name": "axios"
+  },
+  "resources/css/admin/app.css": {
+    "file": "assets/app-BQugsTi9.css",
+    "src": "resources/css/admin/app.css",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-B4VHL3Vo.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/admin/app.js": {
+    "file": "assets/app-CDZEO3sJ.js",
+    "name": "app",
+    "src": "resources/js/admin/app.js",
+    "isEntry": true,
+    "imports": [
+      "_axios-BimPEqV4.js"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DnAkODTe.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_axios-BimPEqV4.js"
+    ]
+  }
+}
