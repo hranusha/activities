@@ -42,13 +42,30 @@ class UserActivityController extends Controller
     public function store(User $user, ActivityRequest $request): RedirectResponse
     {
          $activityCount = $user->activities()->whereDate('date', $request->date)->count();
+         $data = $request->all();
 
         if ($activityCount >= 4) {
             return redirect()->route('admin.user.edit', $user->id)
                 ->with('message', 'You have reached the maximum limit of 4 activities for this day.');
         }
 
-        $this->activityService->storeActivity($request->all(), false);
+
+        $this->activityService->storeUserActivity($user, $request->all(), false);
+
+        // $imageUrl = null;
+        // if (isset($data['image_url']) && $data['image_url']->isValid()) {
+        //     $image = $data['image_url'];
+        //     $imageUrl = $image->store('images', 'public');
+        // }
+
+        // $activity = Activity::create([
+        //     'title' => $data['title'],
+        //     'description' => $data['description'],
+        //     'image_url' => $imageUrl,
+        //     'date' => $data['date'],
+        //     'is_global' => 0,
+        // ]);
+        // $activity->users()->attach($user->id);
 
         return redirect()->route('admin.user.edit', $user->id);
     }
@@ -82,9 +99,9 @@ class UserActivityController extends Controller
     public function update(User $user, ActivityRequest $request, string $id): RedirectResponse
     {
         $activity = Activity::findOrFail($id);
-
         if($activity->is_global){
-            $this->activityService->storeActivity($request->all(), false);
+            $this->activityService->createUserActivity($user, $activity, $request->all());
+            
         }else{
             $this->activityService->updateActivity($activity, $request->all());
         }

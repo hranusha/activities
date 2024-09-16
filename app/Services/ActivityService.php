@@ -41,11 +41,30 @@ class ActivityService
             'date' => $data['date'],
             'is_global' => $is_global,
         ]);
-        $this->attachActivityToAllUsers($activity);
+            $this->attachActivityToAllUsers($activity);
+    }
+
+    public function storeUserActivity(User $user, array $data, bool $is_global = true)
+    {
+        $imageUrl = null;
+        if (isset($data['image_url']) && $data['image_url']->isValid()) {
+            $image = $data['image_url'];
+            $imageUrl = $image->store('images', 'public');
+        }
+
+        $activity = Activity::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'image_url' => $imageUrl,
+            'date' => $data['date'],
+            'is_global' => 0,
+        ]);
+        $activity->users()->attach($user->id);
     }
 
     public function attachActivityToAllUsers(Activity $activity)
     {
+        
         $userIds = User::whereDoesntHave('roles', function($query) {
             $query->where('name', config('admin.roles.super_admin'));
         })->pluck('id');
@@ -69,6 +88,28 @@ class ActivityService
             'image_url' => $imageUrl,
             'date' => $data['date'],
         ]);
+    }
+
+    public function createUserActivity(User $user, Activity $activity, array $data)
+    {
+        $imageUrl = $activity->image_url;
+        if (isset($data['image']) && $data['image']->isValid()) {
+            if ($imageUrl) {
+                Storage::disk('public')->delete($imageUrl);
+            }
+            $image = $data['image'];
+            $imageUrl = $image->store('images', 'public');
+        }
+
+        $activity_new = Activity::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'image_url' => $imageUrl,
+            'date' => $data['date'],
+            'is_global' => 0,
+        ]);
+        $activity->users()->updateExistingPivot($user->id, ['activity_id' => $activity_new->id]);
+        $activity->save();
     }
 
     public function deleteActivity(Activity $activity)
